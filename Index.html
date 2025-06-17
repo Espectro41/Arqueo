@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculo Arqueo Caja</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 32px 16px;
+      line-height: 1.5;
+    }
+    .app-container {
+      max-width: 480px;
+      width: 100%;
+      background: #1e1e2f;
+      border-radius: 16px;
+      padding: 32px 24px;
+      box-shadow: 0 8px 24px rgba(124,58,237,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin: 0 0 8px 0;
+      background: linear-gradient(135deg, #7c3aed, #14b8a6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #a3a3b8;
+      border-bottom: 1px solid #44445c;
+      padding-bottom: 8px;
+      text-align: center;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .input-label {
+      font-weight: 600;
+      color: #9a8cfe;
+      margin-left: 6px;
+      user-select: none;
+    }
+    input[type="text"] {
+      padding: 12px 16px;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: none;
+      outline-offset: 2px;
+      background: #2a2a3d;
+      color: #e0e0e0;
+      transition: box-shadow 0.3s ease;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+    input[type="text"]:focus {
+      box-shadow: 0 0 0 3px #7c3aed88;
+      background: #241f3a;
+    }
+    .button-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #7c3aed, #14b8a6);
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #fefefe;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 12px rgba(124,58,237,0.6);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+      justify-content: center;
+      flex: 1 1 120px;
+      min-width: 120px;
+    }
+    button:focus-visible {
+      outline: 3px solid #14b8a6aa;
+      outline-offset: 2px;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(124,58,237,0.8);
+    }
+    button:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 2px 8px rgba(124,58,237,0.6);
+    }
+    button:disabled {
+      cursor: not-allowed;
+      background: #575768;
+      box-shadow: none;
+      color: #bbbbbb;
+      transform: none;
+    }
+    .result {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #bd1321;
+      min-height: 48px;
+      padding: 16px 0;
+      text-align: center;
+      user-select: text;
+      background: #2a2a3d;
+      border-radius: 18px;
+      box-shadow: inset 0 0 8px #7c3aed44;
+      margin-top: 12px;
+      word-break: break-word;
+    }
+    .result.empty {
+      color: #a3a3b8;
+      font-weight: 400;
+    }
+    .footer-note {
+      font-size: 0.9rem;
+      color: #8888b0;
+      text-align: center;
+      user-select: none;
+      padding-bottom: 8px;
+      border-top: 1px solid #44445c;
+      margin-top: 20px;
+      font-style: italic;
+    }
+    @media (max-width: 480px) {
+      .form-group {
+        gap: 12px;
+      }
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-container" role="main" aria-label="Aplicación para calcular arqueos de caja">
+    <h1>Calculo Arqueo Caja</h1>
+
+    <section aria-labelledby="calculo-header">
+      <h2 id="calculo-header">Ingrese los valores</h2>
+      <form id="form-calculo" aria-describedby="calculo-desc" autocomplete="off">
+        <p id="calculo-desc" class="sr-only">
+          Ingrese datos requeridos para realizar el calculo del Arqueo realizado.
+        </p>
+        <div class="form-group">
+          <label class="input-label" for="val1">Fondo Inicial</label>
+          <input
+            type="text"
+            id="val1"
+            name="val1"
+            placeholder="Ej: 65.000"
+            aria-label="Valor correspondiente al efectivo en caja contado en la apertura"
+            inputmode="numeric"
+            pattern="[0-9.]+"
+            required
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-group">
+          <label class="input-label" for="val2">Totales Caja</label>
+          <input
+            type="text"
+            id="val2"
+            name="val2"
+            placeholder="Ej: 500.000"
+            aria-label="Valor obtenidos de los ingresos de fectivos hasta la hora"
+            inputmode="numeric"
+            pattern="[0-9.]+"
+            required
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-group">
+          <label class="input-label" for="val3">Fondo adicional (Consultar Tesorería)</label>
+          <input
+            type="text"
+            id="val3"
+            name="val3"
+            placeholder="Ej: 1.000.000"
+            aria-label="Dinero solicitado en tesoreria"
+            inputmode="numeric"
+            pattern="[0-9.]+"
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-group">
+          <label class="input-label" for="val4">Total depositos realizados (Consultar Tesorería)</label>
+          <input
+            type="text"
+            id="val4"
+            name="val4"
+            placeholder="Ej: 720.000"
+            aria-label="Depositos generados antes del arqueo"
+            inputmode="numeric"
+            pattern="[0-9.]+"
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-group">
+          <label class="input-label" for="val5">Total Arqueo</label>
+          <input
+            type="text"
+            id="val5"
+            name="val5"
+            placeholder="Ej: 320.000"
+            aria-label="Dinero contado en la caja"
+            inputmode="numeric"
+            pattern="[0-9.]+"
+            required
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="button-group">
+          <button type="submit" aria-label="Calcular suma menos resta">
+            <span class="material-icons" aria-hidden="true">calculate</span> Calcular Resultado
+          </button>
+          <button type="button" id="btn-limpiar" aria-label="Limpiar todos los campos y el resultado" style="background:#575768;">
+            <span class="material-icons" aria-hidden="true">clear</span> Limpiar
+          </button>
+        </div>
+      </form>
+      <div id="resultado-final" class="result empty" aria-live="polite" role="status"></div>
+    </section>
+    <div class="footer-note" aria-hidden="true">By Roberto Espinoza</div>
+  </main>
+
+  <script>
+    // Funcion para formatear números con separador de miles (puntos)
+    function formatNumberWithThousandsSeparator(value) {
+      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    // Funcion para limpiar el valor ingresado y parsear a número sin puntos
+    function parseNumberFromInput(value) {
+      if (!value) return 0;
+      const cleaned = value.replace(/[.]/g, '');
+      const parsed = parseInt(cleaned, 10);
+      return isNaN(parsed) || parsed < 0 ? 0 : parsed;
+    }
+
+    // Formatear input con separador de miles en blur
+    function formatInputValue(input) {
+      const val = parseNumberFromInput(input.value);
+      input.value = val ? formatNumberWithThousandsSeparator(val) : '';
+    }
+
+    // Quitar formato para facilitar edición en focus
+    function unformatInputValue(input) {
+      input.value = input.value.replace(/[.]/g, '');
+    }
+
+    // Agregar listeners a inputs para formato dinámico
+    const inputs = document.querySelectorAll('#form-calculo input[type="text"]');
+    inputs.forEach(input => {
+      input.addEventListener('focus', () => unformatInputValue(input));
+      input.addEventListener('blur', () => formatInputValue(input));
+    });
+
+    const formCalculo = document.getElementById('form-calculo');
+    const resultadoFinal = document.getElementById('resultado-final');
+    const btnLimpiar = document.getElementById('btn-limpiar');
+
+    formCalculo.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      // Obtener valores limpios y parseados
+      const val1 = parseNumberFromInput(document.getElementById('val1').value);
+      const val2 = parseNumberFromInput(document.getElementById('val2').value);
+      const val3 = parseNumberFromInput(document.getElementById('val3').value);
+      const val4 = parseNumberFromInput(document.getElementById('val4').value);
+      const val5 = parseNumberFromInput(document.getElementById('val5').value);
+
+      const sumaPositivos = val1 + val2 + val3;
+      const sumaNegativos = val4 + val5;
+      const resultado = sumaNegativos - sumaPositivos;
+
+      const resultadoFormateado = formatNumberWithThousandsSeparator(Math.abs(resultado));
+
+      if (resultado < 0) {
+        resultadoFinal.textContent = `Déficit: -${resultadoFormateado}`;
+      } else {
+        resultadoFinal.textContent = `Superábit: ${resultadoFormateado}`;
+      }
+      resultadoFinal.classList.remove('empty');
+    });
+
+    btnLimpiar.addEventListener('click', () => {
+      inputs.forEach(input => input.value = '');
+      resultadoFinal.textContent = '';
+      resultadoFinal.classList.add('empty');
+      inputs[0].focus();
+    });
+  </script>
+</body>
+</html>
