@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculo Arqueo Caja</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    /* Estilos omitidos para brevedad */
+  </style>
+</head>
+<body>
+  <main class="app-container" role="main" aria-label="Aplicación para calcular arqueos de caja">
+    <h1>Calculo Arqueo Caja</h1>
+
+    <section aria-labelledby="calculo-header">
+      <h2 id="calculo-header">Ingrese los valores</h2>
+      <form id="form-calculo" aria-describedby="calculo-desc" autocomplete="off">
+        <p id="calculo-desc" class="sr-only">
+          Ingrese datos requeridos para realizar el calculo del Arqueo realizado.
+        </p>
+        <div class="form-group">
+          <label class="input-label" for="val1">Fondo Inicial</label>
+          <input
+            type="text"
+            id="val1"
+            name="val1"
+            placeholder="Ej: 65.000"
+            aria-label="Valor correspondiente al efectivo en caja contado en la apertura"
+            inputmode="numeric"
+            pattern="-?[0-9.]+"  <!-- Permitir números negativos -->
+            required
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-group">
+          <label class="input-label" for="val2">Totales Caja</label>
+          <input
+            type="text"
+            id="val2"
+            name="val2"
+            placeholder="Ej: -500.000"
+            aria-label="Valor obtenidos de los ingresos de fectivos hasta la hora"
+            inputmode="numeric"
+            pattern="-?[0-9.]+"  <!-- Permitir números negativos -->
+            required
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-group">
+          <label class="input-label" for="val3">Fondo adicional (Consultar Tesorería)</label>
+          <input
+            type="text"
+            id="val3"
+            name="val3"
+            placeholder="Ej: 1.000.000"
+            aria-label="Dinero solicitado en tesoreria"
+            inputmode="numeric"
+            pattern="[0-9.]+" 
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-group">
+          <label class="input-label" for="val4">Total depositos realizados (Consultar Tesorería)</label>
+          <input
+            type="text"
+            id="val4"
+            name="val4"
+            placeholder="Ej: 720.000"
+            aria-label="Depositos generados antes del arqueo"
+            inputmode="numeric"
+            pattern="[0-9.]+" 
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-group">
+          <label class="input-label" for="val5">Total Arqueo</label>
+          <input
+            type="text"
+            id="val5"
+            name="val5"
+            placeholder="Ej: 320.000"
+            aria-label="Dinero contado en la caja"
+            inputmode="numeric"
+            pattern="[0-9.]+" 
+            required
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="button-group">
+          <button type="submit" aria-label="Calcular suma menos resta">
+            <span class="material-icons" aria-hidden="true">calculate</span> Calcular Resultado
+          </button>
+          <button type="button" id="btn-limpiar" aria-label="Limpiar todos los campos y el resultado" style="background:#575768;">
+            <span class="material-icons" aria-hidden="true">clear</span> Limpiar
+          </button>
+        </div>
+      </form>
+      <div id="resultado-final" class="result empty" aria-live="polite" role="status"></div>
+    </section>
+    <div class="footer-note" aria-hidden="true">By Roberto Espinoza</div>
+  </main>
+
+  <script>
+    // Función para formatear números con separador de miles (puntos)
+    function formatNumberWithThousandsSeparator(value) {
+      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    // Función para limpiar el valor ingresado y parsear a número sin puntos
+    function parseNumberFromInput(value) {
+      if (!value) return 0;
+      const cleaned = value.replace(/[.]/g, '');
+      const parsed = parseFloat(cleaned); // Cambiar a parseFloat para permitir números negativos
+      return isNaN(parsed) ? 0 : parsed; // Permitir valores negativos
+    }
+
+    // Formatear input con separador de miles en blur
+    function formatInputValue(input) {
+      const val = parseNumberFromInput(input.value);
+      input.value = val ? formatNumberWithThousandsSeparator(Math.abs(val)) : ''; // Mostrar solo el valor absoluto
+    }
+
+    // Quitar formato para facilitar edición en focus
+    function unformatInputValue(input) {
+      input.value = input.value.replace(/[.]/g, '');
+    }
+
+    // Agregar listeners a inputs para formato dinámico
+    const inputs = document.querySelectorAll('#form-calculo input[type="text"]');
+    inputs.forEach(input => {
+      input.addEventListener('focus', () => unformatInputValue(input));
+      input.addEventListener('blur', () => formatInputValue(input));
+    });
+
+    const formCalculo = document.getElementById('form-calculo');
+    const resultadoFinal = document.getElementById('resultado-final');
+    const btnLimpiar = document.getElementById('btn-limpiar');
+
+    formCalculo.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      // Obtener valores limpios y parseados
+      const val1 = parseNumberFromInput(document.getElementById('val1').value);
+      const val2 = parseNumberFromInput(document.getElementById('val2').value);
+      const val3 = parseNumberFromInput(document.getElementById('val3').value);
+      const val4 = parseNumberFromInput(document.getElementById('val4').value);
+      const val5 = parseNumberFromInput(document.getElementById('val5').value);
+
+      const sumaPositivos = val1 + val2 + val3;
+      const sumaNegativos = val4 + val5;
+      const resultado = sumaNegativos - sumaPositivos;
+
+      const resultadoFormateado = formatNumberWithThousandsSeparator(Math.abs(resultado));
+
+      if (resultado < 0) {
+        resultadoFinal.textContent = `Déficit: -${resultadoFormateado}`;
+      } else {
+        resultadoFinal.textContent = `Superávit: ${resultadoFormateado}`;
+      }
+      resultadoFinal.classList.remove('empty');
+    });
+
+    btnLimpiar.addEventListener('click', () => {
+      inputs.forEach(input => input.value = '');
+      resultadoFinal.textContent = '';
+      resultadoFinal.classList.add('empty');
+      inputs[0].focus();
+    });
+  </script>
+</body>
+</html>
