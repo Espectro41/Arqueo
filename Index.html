@@ -192,8 +192,8 @@
             type="text"
             id="val2"
             name="val2"
-            placeholder="Ej: 500.000"
-            aria-label="Valor obtenidos de los ingresos de fectivos hasta la hora"
+            placeholder="Ej: 500.000 para valor negativo (-500.000)"
+            aria-label="Valor obtenidos de los ingresos de efectivo hasta la hora"
             inputmode="numeric"
             pattern="-?[0-9.]+"
             required
@@ -257,24 +257,25 @@
 
   <script>
     // Funcion para formatear números con separador de miles (puntos)
-    function formatNumberWithThousandsSeparator(value) {
-      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-
+function formatNumberWithThousandsSeparator(value) {
+  const isNegative = value < 0;
+  const absValue = Math.abs(value);
+  const formatted = absValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return isNegative ? `-${formatted}` : formatted;
+}
     // Funcion para limpiar el valor ingresado y parsear a número sin puntos
-    function parseNumberFromInput(value) {
-      if (!value) return 0;
-      const cleaned = value.replace(/[.]/g, '');
-      const parsed = parseInt(cleaned, 10);
-      return isNaN(parsed) || parsed < 0 ? 0 : parsed;
-    }
+   function parseNumberFromInput(value) {
+  if (!value) return 0;
+  const cleaned = value.replace(/[.]/g, '');
+  const parsed = parseInt(cleaned, 10);
+  return isNaN(parsed) ? 0 : parsed;
+}
 
-    // Formatear input con separador de miles en blur
-    function formatInputValue(input) {
-      const val = parseNumberFromInput(input.value);
-      input.value = val ? formatNumberWithThousandsSeparator(val) : '';
-    }
-
+function formatInputValue(input) {
+  const val = parseNumberFromInput(input.value);
+  // Permitimos que muestre el valor formateado incluso si es menor o igual a cero
+  input.value = val !== 0 ? formatNumberWithThousandsSeparator(val) : (input.value === '-' ? '-' : '');
+}
     // Quitar formato para facilitar edición en focus
     function unformatInputValue(input) {
       input.value = input.value.replace(/[.]/g, '');
