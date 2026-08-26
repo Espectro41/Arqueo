@@ -7,7 +7,159 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <style>
-    /* Estilos omitidos para brevedad */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 32px 16px;
+      line-height: 1.5;
+    }
+    .app-container {
+      max-width: 480px;
+      width: 100%;
+      background: #1e1e2f;
+      border-radius: 16px;
+      padding: 32px 24px;
+      box-shadow: 0 8px 24px rgba(124,58,237,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin: 0 0 8px 0;
+      background: linear-gradient(135deg, #7c3aed, #14b8a6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #a3a3b8;
+      border-bottom: 1px solid #44445c;
+      padding-bottom: 8px;
+      text-align: center;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .input-label {
+      font-weight: 600;
+      color: #9a8cfe;
+      margin-left: 6px;
+      user-select: none;
+    }
+    input[type="text"] {
+      padding: 12px 16px;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: none;
+      outline-offset: 2px;
+      background: #2a2a3d;
+      color: #e0e0e0;
+      transition: box-shadow 0.3s ease;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+    input[type="text"]:focus {
+      box-shadow: 0 0 0 3px #7c3aed88;
+      background: #241f3a;
+    }
+    .button-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #7c3aed, #14b8a6);
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #fefefe;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 12px rgba(124,58,237,0.6);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+      justify-content: center;
+      flex: 1 1 120px;
+      min-width: 120px;
+    }
+    button:focus-visible {
+      outline: 3px solid #14b8a6aa;
+      outline-offset: 2px;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(124,58,237,0.8);
+    }
+    button:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 2px 8px rgba(124,58,237,0.6);
+    }
+    button:disabled {
+      cursor: not-allowed;
+      background: #575768;
+      box-shadow: none;
+      color: #bbbbbb;
+      transform: none;
+    }
+    .result {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #bd1321;
+      min-height: 48px;
+      padding: 16px 0;
+      text-align: center;
+      user-select: text;
+      background: #2a2a3d;
+      border-radius: 18px;
+      box-shadow: inset 0 0 8px #7c3aed44;
+      margin-top: 12px;
+      word-break: break-word;
+    }
+    .result.empty {
+      color: #a3a3b8;
+      font-weight: 400;
+    }
+    .footer-note {
+      font-size: 0.9rem;
+      color: #8888b0;
+      text-align: center;
+      user-select: none;
+      padding-bottom: 8px;
+      border-top: 1px solid #44445c;
+      margin-top: 20px;
+      font-style: italic;
+    }
+    @media (max-width: 480px) {
+      .form-group {
+        gap: 12px;
+      }
+      .button-group {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -29,7 +181,7 @@
             placeholder="Ej: 65.000"
             aria-label="Valor correspondiente al efectivo en caja contado en la apertura"
             inputmode="numeric"
-            pattern="-?[0-9.]+"  <!-- Permitir números negativos -->
+            pattern="[0-9.]+"
             required
             autocomplete="off"
           />
@@ -40,10 +192,10 @@
             type="text"
             id="val2"
             name="val2"
-            placeholder="Ej: -500.000"
-            aria-label="Valor obtenidos de los ingresos de fectivos hasta la hora"
+            placeholder="Ej: 500.000 para valor negativo (-500.000)"
+            aria-label="Valor obtenidos de los ingresos de efectivo hasta la hora"
             inputmode="numeric"
-            pattern="-?[0-9.]+"  <!-- Permitir números negativos -->
+            pattern="-?[0-9.]+"
             required
             autocomplete="off"
           />
@@ -57,7 +209,7 @@
             placeholder="Ej: 1.000.000"
             aria-label="Dinero solicitado en tesoreria"
             inputmode="numeric"
-            pattern="[0-9.]+" 
+            pattern="[0-9.]+"
             autocomplete="off"
           />
         </div>
@@ -70,7 +222,7 @@
             placeholder="Ej: 720.000"
             aria-label="Depositos generados antes del arqueo"
             inputmode="numeric"
-            pattern="[0-9.]+" 
+            pattern="[0-9.]+"
             autocomplete="off"
           />
         </div>
@@ -83,7 +235,7 @@
             placeholder="Ej: 320.000"
             aria-label="Dinero contado en la caja"
             inputmode="numeric"
-            pattern="[0-9.]+" 
+            pattern="[0-9.]+"
             required
             autocomplete="off"
           />
@@ -104,25 +256,26 @@
   </main>
 
   <script>
-    // Función para formatear números con separador de miles (puntos)
-    function formatNumberWithThousandsSeparator(value) {
-      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
+    // Funcion para formatear números con separador de miles (puntos)
+function formatNumberWithThousandsSeparator(value) {
+  const isNegative = value < 0;
+  const absValue = Math.abs(value);
+  const formatted = absValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return isNegative ? `-${formatted}` : formatted;
+}
+    // Funcion para limpiar el valor ingresado y parsear a número sin puntos
+   function parseNumberFromInput(value) {
+  if (!value) return 0;
+  const cleaned = value.replace(/[.]/g, '');
+  const parsed = parseInt(cleaned, 10);
+  return isNaN(parsed) ? 0 : parsed;
+}
 
-    // Función para limpiar el valor ingresado y parsear a número sin puntos
-    function parseNumberFromInput(value) {
-      if (!value) return 0;
-      const cleaned = value.replace(/[.]/g, '');
-      const parsed = parseFloat(cleaned); // Cambiar a parseFloat para permitir números negativos
-      return isNaN(parsed) ? 0 : parsed; // Permitir valores negativos
-    }
-
-    // Formatear input con separador de miles en blur
-    function formatInputValue(input) {
-      const val = parseNumberFromInput(input.value);
-      input.value = val ? formatNumberWithThousandsSeparator(Math.abs(val)) : ''; // Mostrar solo el valor absoluto
-    }
-
+function formatInputValue(input) {
+  const val = parseNumberFromInput(input.value);
+  // Permitimos que muestre el valor formateado incluso si es menor o igual a cero
+  input.value = val !== 0 ? formatNumberWithThousandsSeparator(val) : (input.value === '-' ? '-' : '');
+}
     // Quitar formato para facilitar edición en focus
     function unformatInputValue(input) {
       input.value = input.value.replace(/[.]/g, '');
